@@ -1,4 +1,6 @@
 #include <driver/scanner.hpp>
+#include <Logger.hpp>
+#include <ctime>
 
 // Returns true if given card number is valid
 bool checkLuhn(const std::string& cardNo) {
@@ -31,11 +33,8 @@ bool checkAmount(const int& amount){
 	return true;
 }
 
-/*! \enum state
- *
- *  Detailed description
- */
-enum State {idle,input_pin,approve_amount,transaction};
+enum State {idle=0,input_pin,approve_amount,transaction};
+
 
 
 int main(int argc, char *argv[])
@@ -43,17 +42,23 @@ int main(int argc, char *argv[])
 	int amount = 5000;
 	Scanner scanner{"swipe"};
 	State state = idle;
+	auto prevState = state;
+	Logger hmiLog("Scanner HMI");
 
 	while(true){
 		std::string data;
+		std::string msg;
 
 		switch (state) {
 			case idle:
 				scanner.waitAndGetData(data);
+				msg = "checkLuhn( " + data + " ) returned ";
 				if (checkLuhn(data)) {
 					state = input_pin;
+					std::cout << "Validated by Luhn: " << data << std::endl;
+					msg += "True";
 				} else {
-					// TODO Log
+					msg += "False";
 				}
 
 				break;
@@ -88,6 +93,11 @@ int main(int argc, char *argv[])
 
 			default:
 				break;
+		}
+		if (state != prevState) {
+			static std::string stateString[] ={"idle","input_pin","approve_amount","transaction"};
+			hmiLog.log("State changed ( " + stateString[prevState] + " => " + stateString[state] + " )");
+			prevState = state;
 		}
 	}
 	
