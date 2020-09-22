@@ -1,5 +1,5 @@
-#include <driver/scanner.hpp>
-#include <Logger.hpp>
+#include <ESD/driver/scanner.hpp>
+#include <ESD/Logger.hpp>
 #include <ctime>
 
 // Returns true if given card number is valid
@@ -43,7 +43,7 @@ int main(int argc, char *argv[])
 	Scanner scanner{"swipe"};
 	State state = idle;
 	auto prevState = state;
-	Logger hmiLog("Scanner HMI");
+	Logger hmiLog("Scanner HMI","/tmp/esd.log");
 
 	while(true){
 		std::string data;

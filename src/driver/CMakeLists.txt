@@ -1,4 +1,4 @@
-set(HEADER_LIST "${ESD_SOURCE_DIR}/include/driver/scanner.hpp")
+set(HEADER_LIST "${ESD_SOURCE_DIR}/include/ESD/driver/scanner.hpp")
 
 # Make an automatic library - will be static or dynamic based on user setting
 add_library(scanner scanner.cpp ${HEADER_LIST})

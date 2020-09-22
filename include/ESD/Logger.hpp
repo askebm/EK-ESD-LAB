@@ -15,10 +15,9 @@ private:
 	static std::mutex mutex;
 
 public:
-	Logger(std::string context, std::string file="/tmp/esd.log");
+	Logger(std::string, std::string);
 	~Logger();
 	void log(const std::string& msg);
 };
-
 
 #endif /* LOGGER_H */

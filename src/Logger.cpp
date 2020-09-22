@@ -1,14 +1,11 @@
-#include <Logger.hpp>
+#include <ESD/Logger.hpp>
 
-Logger::Logger(std::string context, std::string file) : context(context) {
-	if (!this->file.is_open()) {
-		Logger::cnt = 0;
-		this->file.open(file);
-	}
-
+Logger::Logger(std::string c, std::string fileName) : context(c) {
+	if (!this->file.is_open()) 
+		this->file.open(fileName);
 	++Logger::cnt;
-
 }
+
 
 Logger::~Logger() {
 	if (--Logger::cnt == 0) {
@@ -27,3 +24,6 @@ void Logger::log(const std::string& msg) {
 	this->mutex.unlock();
 }
 
+unsigned int Logger::cnt= 0;
+std::ofstream Logger::file;
+std::mutex Logger::mutex;
