@@ -20,6 +20,10 @@ set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
 set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE ONLY)
 
 
+include(${PROJECT_SOURCE_DIR}/cmake/FindGPIO.cmake)
+include(${PROJECT_SOURCE_DIR}/cmake/CompileLibExample.cmake)
+
+
 add_subdirectory(src)
 add_subdirectory(app)
 
