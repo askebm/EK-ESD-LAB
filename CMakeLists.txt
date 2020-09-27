@@ -22,6 +22,8 @@ set(CMAKE_FIND_ROOT_PATH_MODE_PACKAGE ONLY)
 
 include(${PROJECT_SOURCE_DIR}/cmake/FindGPIO.cmake)
 
+include(cmake/DeploymentTest.cmake)
+
 
 add_subdirectory(src)
 add_subdirectory(app)
