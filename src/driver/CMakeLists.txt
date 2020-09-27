@@ -15,3 +15,7 @@ source_group(
   PREFIX "Header Files"
   FILES ${HEADER_LIST})
 
+add_library(NumpadDriver NumpadDriver.cpp)
+target_include_directories(NumpadDriver PUBLIC ${PROJECT_SOURCE_DIR}/include)
+target_compile_features(NumpadDriver PRIVATE cxx_std_11)
+target_link_libraries(NumpadDriver PUBLIC GPIO)
