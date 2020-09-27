@@ -5,3 +5,5 @@ target_link_libraries(scannerHMI scanner logger)
 add_executable(gpioExample gpioExample.cpp)
 #target_compile_features(gpioExample PRIVATE cxx_std_14)
 target_link_libraries(gpioExample GPIO)
+
+add_deploy_target(gpioExample)
