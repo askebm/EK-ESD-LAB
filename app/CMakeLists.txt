@@ -11,3 +11,8 @@ add_executable(NumpadDriverExample	NumpadDriverExample.cpp)
 target_compile_features(NumpadDriverExample PRIVATE cxx_std_11)
 target_link_libraries(NumpadDriverExample PRIVATE NumpadDriver)
 add_deploy_target(NumpadDriverExample)
+
+add_executable(DisplayDriverExample	DisplayDriverExample.cpp)
+target_compile_features(DisplayDriverExample PRIVATE cxx_std_11)
+target_link_libraries(DisplayDriverExample PRIVATE DisplayDriver)
+add_deploy_target(DisplayDriverExample)

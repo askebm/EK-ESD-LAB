@@ -19,3 +19,8 @@ add_library(NumpadDriver NumpadDriver.cpp)
 target_include_directories(NumpadDriver PUBLIC ${PROJECT_SOURCE_DIR}/include)
 target_compile_features(NumpadDriver PRIVATE cxx_std_11)
 target_link_libraries(NumpadDriver PUBLIC GPIO)
+
+add_library(DisplayDriver DisplayDriver.cpp)
+target_include_directories(DisplayDriver PUBLIC ${PROJECT_SOURCE_DIR}/include)
+target_compile_features(DisplayDriver PRIVATE cxx_std_11)
+target_link_libraries(DisplayDriver  PUBLIC GPIO)
