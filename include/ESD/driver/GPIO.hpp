@@ -7,22 +7,17 @@ class GPIO
 	private:
 		std::string pin_number;
 
-		int writeToFile(std::string, std::string);
-		int readFromFile(std::string, std::string&);
+		int writeToFile(const std::string&, const std::string&);
+		int readFromFile(const std::string&, std::string&);
 
 		int exportPin();
 		int unexportPin();
 
 	public:
-		GPIO();
-		GPIO(std::string);
+		GPIO(const std::string&);
 
-		int setPinNumber(int);
-
-
-		int setPinDirection(std::string);
-
-		int setPinValue(std::string);
+		int setPinDirection(const std::string&);
+		int setPinValue(const std::string&);
 		int getPinValue(std::string&);
 
 		void set(void);

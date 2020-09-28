@@ -15,6 +15,10 @@ source_group(
   PREFIX "Header Files"
   FILES ${HEADER_LIST})
 
+add_library(GPIO GPIO.cpp)
+target_include_directories(GPIO PUBLIC ${PROJECT_SOURCE_DIR}/include)
+target_compile_features(GPIO PRIVATE cxx_std_11)
+
 add_library(NumpadDriver NumpadDriver.cpp)
 target_include_directories(NumpadDriver PUBLIC ${PROJECT_SOURCE_DIR}/include)
 target_compile_features(NumpadDriver PRIVATE cxx_std_11)
