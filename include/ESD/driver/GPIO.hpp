@@ -10,11 +10,13 @@ class GPIO
 		int writeToFile(const std::string&, const std::string&);
 		int readFromFile(const std::string&, std::string&);
 
-		int exportPin();
-		int unexportPin();
 
 	public:
 		GPIO(const std::string&);
+		~GPIO();
+
+		int exportPin();
+		int unexportPin();
 
 		int setPinDirection(const std::string&);
 		int setPinValue(const std::string&);

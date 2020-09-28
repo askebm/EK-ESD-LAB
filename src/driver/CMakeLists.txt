@@ -16,7 +16,10 @@ source_group(
   FILES ${HEADER_LIST})
 
 add_library(GPIO GPIO.cpp)
-target_include_directories(GPIO PUBLIC ${PROJECT_SOURCE_DIR}/include)
+target_include_directories(GPIO
+	PUBLIC
+	${PROJECT_SOURCE_DIR}/include
+	${PROJECT_SOURCE_DIR}/include/ESD/driver)
 target_compile_features(GPIO PRIVATE cxx_std_11)
 
 add_library(NumpadDriver NumpadDriver.cpp)
