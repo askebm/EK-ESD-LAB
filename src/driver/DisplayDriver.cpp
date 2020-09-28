@@ -43,34 +43,10 @@ void DisplayDriver::initGPIOs() {
 }
 
 void DisplayDriver::initDisplay() {
-	DisplayDriver::bitset b(0);
-	b[DB5] = 1;
-	b[DB4] = 1;
-	b[DB3] = 1;
-
-	register_select->setPinValue("0");
-	read_write->setPinValue("0");
-	setDataBits(b);
-	this->pulseEnableSignal();
-	
-	b[DB2] = 1;
-	b[DB4] = 0;
-	b[DB5] = 0;
-	
-	setDataBits(b);
-	this->pulseEnableSignal();
-
-	this->clear();
+	sendCommand(DisplayDriver::CMD::SET_FUNCTION);
+	sendCommand(DisplayDriver::CMD::DISPLAY_ON);
+	sendCommand(DisplayDriver::CMD::CLEAR);
 	usleep(5000);
-
-	b.reset();
-	b[DB2] = 1;
-	b[DB0] = 0; // Don't shift display
-	b[DB1] = 1; // Shift cursor right on DDRAM increment
-
-	setDataBits(b);
-	this->pulseEnableSignal();
-
 }
 
 void DisplayDriver::setDataBits(std::string s) {
@@ -104,6 +80,15 @@ void DisplayDriver::sendCommand(const DisplayDriver::CMD& cmd) {
 		case DisplayDriver::CMD::SHIFT_CURSOR_RIGHT :
 			b[DB4] = 1;
 			b[DB2] = 1;
+			break;
+		case DisplayDriver::CMD::SET_FUNCTION :
+			b[DB5] = 1;
+			b[DB4] = 1;
+			b[DB3] = 1;
+			break;
+		case DisplayDriver::CMD::DISPLAY_ON :
+			b[DB2] = 1;
+			b[DB3] = 1;
 			break;
 		default:
 			;

@@ -10,7 +10,8 @@ class DisplayDriver
 public:
 	typedef std::bitset<8> bitset;
 	enum Bits { DB0=0,DB1,DB2,DB3,DB4,DB5,DB6,DB7};
-	enum CMD {HOME,CLEAR,SHIFT_CURSOR_RIGHT};
+	enum CMD {HOME,CLEAR,SHIFT_CURSOR_RIGHT,SET_FUNCTION,DISPLAY_ON,
+	};
 
 private:
 	std::array<GPIO*,8> data_bit;
