@@ -1,28 +1,45 @@
 #include <ESD/driver/DisplayDriver.hpp>
 #include <unistd.h>
 
+const DisplayDriver::cmd DisplayDriver::CLEAR_DISPLAY;
+const DisplayDriver::cmd DisplayDriver::RETURN_HOME;
+const DisplayDriver::cmd DisplayDriver::ENTRY_MODE_SHIFT_CURSOR_RIGHT;
+const DisplayDriver::cmd DisplayDriver::DISPLAY_ON;
+const DisplayDriver::cmd DisplayDriver::DISPLAY_OFF;
+const DisplayDriver::cmd DisplayDriver::FUNCTION_SET;
 
 DisplayDriver::DisplayDriver() {
 
+}
+
+DisplayDriver::~DisplayDriver(){
+	delete register_select;
+	delete read_write;
+	delete enable;
+	for (auto io : data_bit) {
+		delete io;
+	}
 }
 
 void DisplayDriver::init() {
 	this->initGPIOs();
 	usleep(30000);
 	this->initDisplay();
-
 }
 
-void DisplayDriver::print(int n,std::string s) {
-	this->sendCommand(DisplayDriver::CMD::CLEAR);
-	this->sendCommand(DisplayDriver::CMD::HOME);
+void DisplayDriver::print(cmd_in n,std::string s) {
+	int top = 0x00;
+	int bottom = 0x40;
+	if (n < 16) {
+		setDDRAMAddress(n);
+	} else {
+		setDDRAMAddress(bottom+n);
+	}
 	sendData(s);
 }
 
 void DisplayDriver::clear() {
-	DisplayDriver::bitset b(0);
-	b[DB0] = 1;
-	setDataBits(b);
+	sendCommand(CLEAR_DISPLAY);
 }
 
 void DisplayDriver::initGPIOs() {
@@ -43,20 +60,32 @@ void DisplayDriver::initGPIOs() {
 }
 
 void DisplayDriver::initDisplay() {
-	sendCommand(DisplayDriver::CMD::SET_FUNCTION);
-	sendCommand(DisplayDriver::CMD::DISPLAY_ON);
-	sendCommand(DisplayDriver::CMD::CLEAR);
+	sendCommand(FUNCTION_SET);
+	sendCommand(DISPLAY_ON);
+	sendCommand(CLEAR_DISPLAY);
 	usleep(5000);
 }
 
 void DisplayDriver::setDataBits(std::string s) {
-	
+	cmd command = 0;
+	int i = s.size();
+	for (const auto& c : s) {
+		command |= ((c=='0'?0:1) << --i);
+	}
+	setDataBits(command);
 }
 
-void DisplayDriver::setDataBits(DisplayDriver::bitset b) {
-	for (int i = 0; i < b.size(); ++i) {
-		data_bit[i]->setPinValue(b[i]?"1":"0");
+void DisplayDriver::setDataBits(cmd_in bits){
+	for (int i = 0; i < 8; ++i) {
+		data_bit[i]->setPinValue( ( ( bits & (1<<i) )?"1":"0" ) );
 	}
+}
+
+void DisplayDriver::sendCommand(cmd_in c){
+	register_select->clear();
+	read_write->clear();
+	setDataBits(c);
+	pulseEnableSignal();
 }
 
 void DisplayDriver::pulseEnableSignal() {
@@ -66,48 +95,19 @@ void DisplayDriver::pulseEnableSignal() {
 	usleep(1000);
 }
 
-void DisplayDriver::sendCommand(const DisplayDriver::CMD& cmd) {
-	register_select->setPinValue("0");
-	read_write->setPinValue("0");
-	DisplayDriver::bitset b(0);
-	switch (cmd) {
-		case DisplayDriver::CMD::HOME :
-			b[DB1] = 1;
-			break;
-		case DisplayDriver::CMD::CLEAR :
-			this->clear();
-			break;
-		case DisplayDriver::CMD::SHIFT_CURSOR_RIGHT :
-			b[DB4] = 1;
-			b[DB2] = 1;
-			break;
-		case DisplayDriver::CMD::SET_FUNCTION :
-			b[DB5] = 1;
-			b[DB4] = 1;
-			b[DB3] = 1;
-			break;
-		case DisplayDriver::CMD::DISPLAY_ON :
-			b[DB2] = 1;
-			b[DB3] = 1;
-			break;
-		default:
-			;
-	}
-	setDataBits(b);
-	pulseEnableSignal();
-}
-
 void DisplayDriver::sendData(std::string s) {
 	for (const auto& c : s) {
 		this->sendData(c);
-		this->sendCommand(DisplayDriver::CMD::SHIFT_CURSOR_RIGHT);
 	}	
 }
 
 void DisplayDriver::sendData(const char& c) {
-	register_select->setPinValue("1");
-	read_write->setPinValue("0");
-	DisplayDriver::bitset b(c);
-	this->setDataBits(b);
-	this->pulseEnableSignal();
+	register_select->set();
+	read_write->clear();
+	setDataBits(c);
+	pulseEnableSignal();
+}
+
+void DisplayDriver::setDDRAMAddress(cmd_in addr){
+	sendCommand( addr | (1 << 7));
 }

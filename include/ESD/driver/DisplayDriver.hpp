@@ -7,11 +7,17 @@
 
 class DisplayDriver
 {
+private:
+	typedef unsigned char cmd;
+	typedef const cmd& cmd_in;
+
+	static const cmd CLEAR_DISPLAY = 0b1;
+	static const cmd RETURN_HOME = 0b10;
+	static const cmd ENTRY_MODE_SHIFT_CURSOR_RIGHT = 0b110;
+	static const cmd DISPLAY_ON = 0b1100;
+	static const cmd DISPLAY_OFF = 0b100;
+	static const cmd FUNCTION_SET = 0b111000;
 public:
-	typedef std::bitset<8> bitset;
-	enum Bits { DB0=0,DB1,DB2,DB3,DB4,DB5,DB6,DB7};
-	enum CMD {HOME,CLEAR,SHIFT_CURSOR_RIGHT,SET_FUNCTION,DISPLAY_ON,
-	};
 
 private:
 	std::array<GPIO*,8> data_bit;
@@ -21,19 +27,21 @@ private:
 
 public:
 	DisplayDriver();
+	~DisplayDriver();
 	void init();
-	void print(int,std::string);
+	void print(cmd_in,std::string);
 	void clear();
 
 private:
 	void initGPIOs();
 	void initDisplay();
 	void setDataBits(std::string);
-	void setDataBits(bitset);
+	void setDataBits(cmd_in);
+	void sendCommand(cmd_in);
 	void pulseEnableSignal();
-	void sendCommand(const CMD&);
 	void sendData(std::string);
 	void sendData(const char&);
+	void setDDRAMAddress(cmd_in);
 };
 
 #endif /* DISPLAYDRIVER_H */
