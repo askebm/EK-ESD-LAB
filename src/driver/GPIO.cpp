@@ -1,6 +1,8 @@
 #include <ESD/driver/GPIO.hpp>
 #include <fstream>
-#include <iostream>
+
+
+static const std::string PATH = "/sys/class/gpio/";
 
 int GPIO::writeToFile(const std::string& file,const std::string& data) {
 	std::ofstream f;
@@ -14,6 +16,7 @@ int GPIO::writeToFile(const std::string& file,const std::string& data) {
 
 int GPIO::readFromFile(const std::string& file, std::string& data) {
 	std::ifstream f(file);
+	auto result = f.good();
 	data.clear();
 	char c;
 	while (f.get(c)) {
@@ -22,11 +25,15 @@ int GPIO::readFromFile(const std::string& file, std::string& data) {
 		}
 	}
 	f.close();
-	return 0;
+	return result;
 }
+
 int GPIO::exportPin(){
 	static const std::string file = "/sys/class/gpio/export";
-	writeToFile(file,pin_number);
+	if (hasValidPin()) {
+		writeToFile(file,pin_number);
+		return 1;
+	}
 	return 0;
 }
 
@@ -36,12 +43,23 @@ int GPIO::unexportPin(){
 	return 0;
 }
 
+GPIO::GPIO(){
+}
+
 GPIO::GPIO(const std::string& pin) : pin_number(pin){
-	//exportPin();
+	exportPin();
 }
 
 GPIO::~GPIO() {
-//	unexportPin();
+	unexportPin();
+}
+
+int GPIO::setPinNumber(const int& pin){
+	if (hasValidPin()) {
+		unexportPin();
+	}
+	pin_number = marshall(pin);
+	return 0;
 }
 
 int GPIO::setPinDirection(const std::string& dir){
@@ -72,3 +90,57 @@ void GPIO::set(void){
 void GPIO::clear(void){
 	setPinValue("0");
 }
+
+void GPIO::initialise() {
+	exportPin();
+}
+
+void GPIO::configure(
+		const std::string& pin,
+		const std::string& direction,
+		const std::string& value){
+
+	pin_number = pin;
+	setPinDirection(direction);
+	setPinValue(value);
+
+}
+
+void GPIO::disable(){
+	unexportPin();
+}
+
+void GPIO::acces(std::string& value){
+	getPinValue(value);
+}
+
+void GPIO::mutate(const std::string& value){
+	setPinValue(value);
+}
+
+std::string GPIO::marshall(const int& in){
+	return std::to_string(in);
+}
+
+bool GPIO::isInitialised(){
+	auto result = hasValidPin();
+	if (result) {
+		std::string tmp;
+		result = bool(getPinValue(tmp));
+	}
+	return result;
+}
+
+bool GPIO::hasValidPin() {
+	bool result;
+	if (pin_number.size()) {
+		result = true;
+		for (const auto& c : pin_number) {
+			result &= ( ( '0' <= c ) && ( c <= '9' ) );
+		}
+	} else {
+		result = false;
+	}
+	return result;
+}
+
