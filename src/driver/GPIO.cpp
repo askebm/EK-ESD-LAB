@@ -1,5 +1,6 @@
 #include <ESD/driver/GPIO.hpp>
 #include <fstream>
+#include <iostream>
 
 
 static const std::string PATH = "/sys/class/gpio/";
@@ -28,9 +29,21 @@ int GPIO::readFromFile(const std::string& file, std::string& data) {
 	return result;
 }
 
+void GPIO::changePin(const std::string& pin){
+	if (isValidPin(this->pin_number)) {
+		unexportPin();
+	}
+	if (isValidPin(pin)) {
+		this->pin_number = pin;
+	} else {
+		std::cerr << "Can't change pin. " << pin << " is not a valid pin." << std::endl;
+	}
+}
+
+
 int GPIO::exportPin(){
 	static const std::string file = "/sys/class/gpio/export";
-	if (hasValidPin()) {
+	if (isValidPin(this->pin_number)) {
 		writeToFile(file,pin_number);
 		return 1;
 	}
@@ -46,19 +59,15 @@ int GPIO::unexportPin(){
 GPIO::GPIO(){
 }
 
-GPIO::GPIO(const std::string& pin) : pin_number(pin){
-	exportPin();
+GPIO::GPIO(const std::string& pin)  {
+	changePin(pin);
 }
 
 GPIO::~GPIO() {
-	unexportPin();
 }
 
 int GPIO::setPinNumber(const int& pin){
-	if (hasValidPin()) {
-		unexportPin();
-	}
-	pin_number = marshall(pin);
+	changePin( marshall(pin) );
 	return 0;
 }
 
@@ -95,26 +104,20 @@ void GPIO::initialise() {
 	exportPin();
 }
 
-void GPIO::configure(
-		const std::string& pin,
-		const std::string& direction,
-		const std::string& value){
-
-	pin_number = pin;
+void GPIO::configure( const std::string& direction, const std::string& value){
 	setPinDirection(direction);
 	setPinValue(value);
-
 }
 
 void GPIO::disable(){
 	unexportPin();
 }
 
-void GPIO::acces(std::string& value){
+void GPIO::accesPinValue(std::string& value){
 	getPinValue(value);
 }
 
-void GPIO::mutate(const std::string& value){
+void GPIO::mutatePinValue(const std::string& value){
 	setPinValue(value);
 }
 
@@ -123,7 +126,7 @@ std::string GPIO::marshall(const int& in){
 }
 
 bool GPIO::isInitialised(){
-	auto result = hasValidPin();
+	auto result = isValidPin(this->pin_number);
 	if (result) {
 		std::string tmp;
 		result = bool(getPinValue(tmp));
@@ -131,11 +134,11 @@ bool GPIO::isInitialised(){
 	return result;
 }
 
-bool GPIO::hasValidPin() {
+bool GPIO::isValidPin(const std::string& pin) {
 	bool result;
-	if (pin_number.size()) {
+	if (pin.size()) {
 		result = true;
-		for (const auto& c : pin_number) {
+		for (const auto& c : pin) {
 			result &= ( ( '0' <= c ) && ( c <= '9' ) );
 		}
 	} else {

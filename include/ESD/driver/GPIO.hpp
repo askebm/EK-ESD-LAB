@@ -1,15 +1,20 @@
 #ifndef GPIO_H
 #define GPIO_H
 #include <string>
+#include <map>
 
 class GPIO
 {
 	private:
 		std::string pin_number;
 
-
 		int writeToFile(const std::string&, const std::string&);
 		int readFromFile(const std::string&, std::string&);
+		void changePin(const std::string&);
+
+		void lock();
+		bool testLock();
+		void unlock();
 
 
 	public:
@@ -32,10 +37,10 @@ class GPIO
 
 		// Hardware proxy methods
 		void initialise();
-		void configure(const std::string&, const std::string&, const std::string&);
+		void configure(const std::string&, const std::string&);
 		void disable();
-		void acces(std::string&);
-		void mutate(const std::string&);
+		void accesPinValue(std::string&);
+		void mutatePinValue(const std::string&);
 
 	private:
 		// TODO maybe a template?
@@ -43,7 +48,7 @@ class GPIO
 
 		//Helpers
 		bool isInitialised();
-		bool hasValidPin();
+		bool isValidPin(const std::string&);
 
 };
 
