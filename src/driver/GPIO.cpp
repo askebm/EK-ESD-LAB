@@ -2,7 +2,6 @@
 #include <fstream>
 
 
-static const std::string PATH = "/sys/class/gpio/";
 
 int GPIO::writeToFile(const std::string& file,const std::string& data) {
 	std::ofstream f;
@@ -58,7 +57,7 @@ int GPIO::setPinNumber(const int& pin){
 	if (hasValidPin()) {
 		unexportPin();
 	}
-	pin_number = marshall(pin);
+	pin_number = marshallPin(pin);
 	return 0;
 }
 
@@ -91,34 +90,7 @@ void GPIO::clear(void){
 	setPinValue("0");
 }
 
-void GPIO::initialise() {
-	exportPin();
-}
-
-void GPIO::configure(
-		const std::string& pin,
-		const std::string& direction,
-		const std::string& value){
-
-	pin_number = pin;
-	setPinDirection(direction);
-	setPinValue(value);
-
-}
-
-void GPIO::disable(){
-	unexportPin();
-}
-
-void GPIO::acces(std::string& value){
-	getPinValue(value);
-}
-
-void GPIO::mutate(const std::string& value){
-	setPinValue(value);
-}
-
-std::string GPIO::marshall(const int& in){
+std::string GPIO::marshallPin(const int& in){
 	return std::to_string(in);
 }
 
@@ -143,4 +115,3 @@ bool GPIO::hasValidPin() {
 	}
 	return result;
 }
-

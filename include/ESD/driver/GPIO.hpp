@@ -7,43 +7,37 @@ class GPIO
 	private:
 		std::string pin_number;
 
-
+		//Helpers
+		bool isInitialised();
+		bool hasValidPin();
 		int writeToFile(const std::string&, const std::string&);
 		int readFromFile(const std::string&, std::string&);
-
 
 	public:
 		GPIO();
 		GPIO(const std::string&);
 		~GPIO();
 
-    int setPinNumber(const int&);
-
+		// initialise
 		int exportPin();
+
+		// disbale
 		int unexportPin();
 
+		// Mutaters
+    int setPinNumber(const int&);
 		int setPinDirection(const std::string&);
 		int setPinValue(const std::string&);
-		int getPinValue(std::string&);
-
 		void set(void);
 		void clear(void);
 
-
-		// Hardware proxy methods
-		void initialise();
-		void configure(const std::string&, const std::string&, const std::string&);
-		void disable();
-		void acces(std::string&);
-		void mutate(const std::string&);
+		// Accessers
+		int getPinValue(std::string&);
 
 	private:
 		// TODO maybe a template?
-		std::string marshall(const int&);
+		std::string marshallPin(const int&);
 
-		//Helpers
-		bool isInitialised();
-		bool hasValidPin();
 
 };
 
