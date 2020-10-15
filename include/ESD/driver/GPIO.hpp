@@ -37,8 +37,6 @@ class GPIO
 	private:
 		// TODO maybe a template?
 		std::string marshallPin(const int&);
-
-
 };
 
 #endif /* GPIO_H */

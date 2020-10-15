@@ -9,13 +9,13 @@ int GPIO::writeToFile(const std::string& file,const std::string& data) {
 	for (const char& i : data) {
 		f << i;
 	}
+	auto result = f.rdstate();
 	f.close();
-	return 0;
+	return result;
 }
 
 int GPIO::readFromFile(const std::string& file, std::string& data) {
 	std::ifstream f(file);
-	auto result = f.good();
 	data.clear();
 	char c;
 	while (f.get(c)) {
@@ -23,6 +23,7 @@ int GPIO::readFromFile(const std::string& file, std::string& data) {
 			data += c;
 		}
 	}
+	auto result = f.rdstate();
 	f.close();
 	return result;
 }
